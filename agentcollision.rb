@@ -87,23 +87,15 @@ class Agentcollision < Formula
 
   def caveats
     <<~EOS
-      AgentCollision #{version} installed.
+      Get started in one command:
 
-      First-time setup:
-        ac init        # detect AI tools, install hooks, optional autostart
+        ac init --yes
 
-      Upgrading from agentberth?
-        ac init        # rewrites your hooks + launchd plist for the new name
-        Your old ~/.agentberth/ data is migrated automatically on first run.
+      That's it. AgentCollision will detect your AI tools, install hooks,
+      and start protecting your repos automatically.
 
-      What's new in this version:
-        https://github.com/agentcollision/agentcollision/blob/main/CHANGELOG.md
-
-      Dashboard (after `ac init`):
-        http://localhost:7777/ui/
-
-      Quick start:
-        https://github.com/agentcollision/agentcollision/blob/main/docs/00-for-first-time-users.md
+      Dashboard: http://localhost:7777/ui/
+      Docs: https://agentcollision.com
     EOS
   end
 
