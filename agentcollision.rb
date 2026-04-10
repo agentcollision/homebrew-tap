@@ -5,13 +5,13 @@
 class Agentcollision < Formula
   desc "Coordination daemon for parallel AI coding agents"
   homepage "https://github.com/agentcollision/agentcollision"
-  version "0.5.0-alpha.2"
+  version "0.5.0"
   license "Apache-2.0"
 
   on_macos do
     if Hardware::CPU.intel?
-      url "https://github.com/agentcollision/agentcollision/releases/download/v0.5.0-alpha.2/agentcollision_0.5.0-alpha.2_darwin_amd64.tar.gz"
-      sha256 "01f771cb8c466877c67e6f640222164eca624165eb3e62a53adc8005f3d02e3b"
+      url "https://github.com/agentcollision/agentcollision/releases/download/v0.5.0/agentcollision_0.5.0_darwin_amd64.tar.gz"
+      sha256 "fa424060d9c79984979df2dd06bb90403e5e5af460a6d28618be88f2a94e06de"
 
       define_method(:install) do
         bin.install "agentcollision"
@@ -19,8 +19,8 @@ class Agentcollision < Formula
       end
     end
     if Hardware::CPU.arm?
-      url "https://github.com/agentcollision/agentcollision/releases/download/v0.5.0-alpha.2/agentcollision_0.5.0-alpha.2_darwin_arm64.tar.gz"
-      sha256 "c8a4bbef512218c7863456cc6d338b694cd9c8adc04725bcc849865a380dc010"
+      url "https://github.com/agentcollision/agentcollision/releases/download/v0.5.0/agentcollision_0.5.0_darwin_arm64.tar.gz"
+      sha256 "14049c573095c09d04c30a0ffaa4d6d8804275698c5d14fd34d14902f3c507a4"
 
       define_method(:install) do
         bin.install "agentcollision"
@@ -31,16 +31,16 @@ class Agentcollision < Formula
 
   on_linux do
     if Hardware::CPU.intel? && Hardware::CPU.is_64_bit?
-      url "https://github.com/agentcollision/agentcollision/releases/download/v0.5.0-alpha.2/agentcollision_0.5.0-alpha.2_linux_amd64.tar.gz"
-      sha256 "7e3794575c91a9226268b0150ff77a5130c251eb2669dc3cbbd0cc749df033b5"
+      url "https://github.com/agentcollision/agentcollision/releases/download/v0.5.0/agentcollision_0.5.0_linux_amd64.tar.gz"
+      sha256 "fbfc3eb2f2effb41d30c20f2afcbd26bfb9e2e9a19cd8d95df2dab029494cac1"
       define_method(:install) do
         bin.install "agentcollision"
         bin.install_symlink "agentcollision" => "ac"
       end
     end
     if Hardware::CPU.arm? && Hardware::CPU.is_64_bit?
-      url "https://github.com/agentcollision/agentcollision/releases/download/v0.5.0-alpha.2/agentcollision_0.5.0-alpha.2_linux_arm64.tar.gz"
-      sha256 "15ae47c04bc906b628b0c126a348c62890281760e3fa271878a82b99efe132a2"
+      url "https://github.com/agentcollision/agentcollision/releases/download/v0.5.0/agentcollision_0.5.0_linux_arm64.tar.gz"
+      sha256 "a142fdd2390415dbf54b05c8da87431bf3d38d3b58fff1fd0bec3e545ed0cad7"
       define_method(:install) do
         bin.install "agentcollision"
         bin.install_symlink "agentcollision" => "ac"
@@ -87,15 +87,23 @@ class Agentcollision < Formula
 
   def caveats
     <<~EOS
-      Get started in one command:
+      AgentCollision #{version} installed.
 
-        ac init --yes
+      First-time setup:
+        ac init        # detect AI tools, install hooks, optional autostart
 
-      That's it. AgentCollision will detect your AI tools, install hooks,
-      and start protecting your repos automatically.
+      Upgrading from agentberth?
+        ac init        # rewrites your hooks + launchd plist for the new name
+        Your old ~/.agentberth/ data is migrated automatically on first run.
 
-      Dashboard: http://localhost:7777/ui/
-      Docs: https://agentcollision.com
+      What's new in this version:
+        https://github.com/agentcollision/agentcollision/blob/main/CHANGELOG.md
+
+      Dashboard (after `ac init`):
+        http://localhost:7777/ui/
+
+      Quick start:
+        https://github.com/agentcollision/agentcollision/blob/main/docs/00-for-first-time-users.md
     EOS
   end
 
