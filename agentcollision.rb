@@ -5,13 +5,13 @@
 class Agentcollision < Formula
   desc "Coordination daemon for parallel AI coding agents"
   homepage "https://github.com/agentcollision/agentcollision"
-  version "0.6.2"
+  version "0.6.3"
   license "Apache-2.0"
 
   on_macos do
     if Hardware::CPU.intel?
-      url "https://github.com/agentcollision/agentcollision/releases/download/v0.6.2/agentcollision_0.6.2_darwin_amd64.tar.gz"
-      sha256 "3f31df32378ef1d4c2b901f0ac631d08d2ad78efb5728f6072815b5902e3b3cc"
+      url "https://github.com/agentcollision/agentcollision/releases/download/v0.6.3/agentcollision_0.6.3_darwin_amd64.tar.gz"
+      sha256 "4fc1da13315c3ed625cad736456ab89c88d82aa370b864df8ecab175820a9333"
 
       define_method(:install) do
         bin.install "agentcollision"
@@ -19,8 +19,8 @@ class Agentcollision < Formula
       end
     end
     if Hardware::CPU.arm?
-      url "https://github.com/agentcollision/agentcollision/releases/download/v0.6.2/agentcollision_0.6.2_darwin_arm64.tar.gz"
-      sha256 "ec2e8bea597b44f992307c6f3d4d5d2ccbdbf6501052436564b22165fe7f0e1a"
+      url "https://github.com/agentcollision/agentcollision/releases/download/v0.6.3/agentcollision_0.6.3_darwin_arm64.tar.gz"
+      sha256 "33beb5aaf1437176b7c2a294a525bf65577c600aadbf3b5bfb2f706dabdcb725"
 
       define_method(:install) do
         bin.install "agentcollision"
@@ -31,16 +31,16 @@ class Agentcollision < Formula
 
   on_linux do
     if Hardware::CPU.intel? && Hardware::CPU.is_64_bit?
-      url "https://github.com/agentcollision/agentcollision/releases/download/v0.6.2/agentcollision_0.6.2_linux_amd64.tar.gz"
-      sha256 "c4fe669cd19441747e85645663c17392f2ecbe8e4d1079cc1ebdeea65c75bfcc"
+      url "https://github.com/agentcollision/agentcollision/releases/download/v0.6.3/agentcollision_0.6.3_linux_amd64.tar.gz"
+      sha256 "7192c6c9ef60a40e503e6cf5fac2721b1ec01ef0d523915269037ead1985352a"
       define_method(:install) do
         bin.install "agentcollision"
         bin.install_symlink "agentcollision" => "ac"
       end
     end
     if Hardware::CPU.arm? && Hardware::CPU.is_64_bit?
-      url "https://github.com/agentcollision/agentcollision/releases/download/v0.6.2/agentcollision_0.6.2_linux_arm64.tar.gz"
-      sha256 "6cbe004ad9776d5c44c4a52d16d5f6c2abd9996b8f0e8abe3295fde106dd31d5"
+      url "https://github.com/agentcollision/agentcollision/releases/download/v0.6.3/agentcollision_0.6.3_linux_arm64.tar.gz"
+      sha256 "bd12478b8d4cf6cfa0599e121ee69f4b8f4ce16362d014b46b37fe5a04497b28"
       define_method(:install) do
         bin.install "agentcollision"
         bin.install_symlink "agentcollision" => "ac"
