@@ -5,13 +5,13 @@
 class Agentcollision < Formula
   desc "Coordination daemon for parallel AI coding agents"
   homepage "https://github.com/agentcollision/agentcollision"
-  version "0.10.1"
+  version "0.10.2"
   license "Apache-2.0"
 
   on_macos do
     if Hardware::CPU.intel?
-      url "https://github.com/agentcollision/agentcollision/releases/download/v0.10.1/agentcollision_0.10.1_darwin_amd64.tar.gz"
-      sha256 "05c31293ca96da2a72834a4b8f62a2121714fc111147bd641f3425756f2d2fdb"
+      url "https://github.com/agentcollision/agentcollision/releases/download/v0.10.2/agentcollision_0.10.2_darwin_amd64.tar.gz"
+      sha256 "cc774134f5b0e812436aac206c71861f32e8aca7da3382b87104b7147b1306ac"
 
       define_method(:install) do
         bin.install "agentcollision"
@@ -19,8 +19,8 @@ class Agentcollision < Formula
       end
     end
     if Hardware::CPU.arm?
-      url "https://github.com/agentcollision/agentcollision/releases/download/v0.10.1/agentcollision_0.10.1_darwin_arm64.tar.gz"
-      sha256 "c665cc21688fd639f683f47365c2a3e09c664ed498967faa479a7c18f6900a29"
+      url "https://github.com/agentcollision/agentcollision/releases/download/v0.10.2/agentcollision_0.10.2_darwin_arm64.tar.gz"
+      sha256 "4b5981535288b34c79a1c5a214e23358e4334d185dd313786f4df76ac5efdfa2"
 
       define_method(:install) do
         bin.install "agentcollision"
@@ -31,16 +31,16 @@ class Agentcollision < Formula
 
   on_linux do
     if Hardware::CPU.intel? && Hardware::CPU.is_64_bit?
-      url "https://github.com/agentcollision/agentcollision/releases/download/v0.10.1/agentcollision_0.10.1_linux_amd64.tar.gz"
-      sha256 "d9122b0066e360763061ff366a0cd3f61487534360b46ae0cc522dc30e07471c"
+      url "https://github.com/agentcollision/agentcollision/releases/download/v0.10.2/agentcollision_0.10.2_linux_amd64.tar.gz"
+      sha256 "c0fb6d890b0b913b3633bd039ff1abf448139aa5655ffc32be5e0e172503e46c"
       define_method(:install) do
         bin.install "agentcollision"
         bin.install_symlink "agentcollision" => "ac"
       end
     end
     if Hardware::CPU.arm? && Hardware::CPU.is_64_bit?
-      url "https://github.com/agentcollision/agentcollision/releases/download/v0.10.1/agentcollision_0.10.1_linux_arm64.tar.gz"
-      sha256 "3aae7c3b7c3bbbcea48daa3f88f84924aa3010f54444de29994af5cf7e2ef049"
+      url "https://github.com/agentcollision/agentcollision/releases/download/v0.10.2/agentcollision_0.10.2_linux_arm64.tar.gz"
+      sha256 "821a285508e661beee5a46adbb0de1807771f24f904e344b330ff0cdb34c7724"
       define_method(:install) do
         bin.install "agentcollision"
         bin.install_symlink "agentcollision" => "ac"
@@ -72,16 +72,11 @@ class Agentcollision < Formula
     # through a shell redirect inside a single argv string so no
     # Ruby keywords leak into Homebrew's output.
     if OS.mac?
-      # Restart the new-name service if registered.
+      # Restart the service if registered so the new binary takes effect
+      # immediately after `brew upgrade` without the user having to
+      # launchctl kickstart by hand.
       quiet_system "/bin/sh", "-c",
         "launchctl kickstart -k gui/$(id -u)/com.agentcollision.daemon 2>/dev/null || true"
-      # Also kick the legacy agentberth service for users upgrading
-      # from pre-rename installs. Their plist is still
-      # com.agentberth.daemon until they re-run `ac init`, and we
-      # want their next tool call to use the NEW binary even if
-      # they haven't re-run init yet.
-      quiet_system "/bin/sh", "-c",
-        "launchctl kickstart -k gui/$(id -u)/com.agentberth.daemon 2>/dev/null || true"
     end
   end
 
@@ -91,10 +86,7 @@ class Agentcollision < Formula
 
       First-time setup:
         ac init        # detect AI tools, install hooks, optional autostart
-
-      Upgrading from agentberth?
-        ac init        # rewrites your hooks + launchd plist for the new name
-        Your old ~/.agentberth/ data is migrated automatically on first run.
+        ac login       # connect this machine to your account (opens browser)
 
       What's new in this version:
         https://github.com/agentcollision/agentcollision/blob/main/CHANGELOG.md
