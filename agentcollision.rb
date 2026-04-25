@@ -5,13 +5,13 @@
 class Agentcollision < Formula
   desc "Coordination daemon for parallel AI coding agents"
   homepage "https://github.com/agentcollision/agentcollision"
-  version "0.11.7"
+  version "0.11.8"
   license "Apache-2.0"
 
   on_macos do
     if Hardware::CPU.intel?
-      url "https://releases.agentcollision.com/v0.11.7/agentcollision_0.11.7_darwin_amd64.tar.gz"
-      sha256 "60b07c679fef2ae09766727f630ac061d7831ce90cdf2c27c97aafa735f89eff"
+      url "https://releases.agentcollision.com/v0.11.8/agentcollision_0.11.8_darwin_amd64.tar.gz"
+      sha256 "7497b75942e7c8dfda3b94bdf23a297c9d77ab38f9462e77ba8e5f62ac0caab5"
 
       define_method(:install) do
         bin.install "agentcollision"
@@ -19,8 +19,8 @@ class Agentcollision < Formula
       end
     end
     if Hardware::CPU.arm?
-      url "https://releases.agentcollision.com/v0.11.7/agentcollision_0.11.7_darwin_arm64.tar.gz"
-      sha256 "b27b759ca5c4b36620204e118a2d135eb40f9fb737addb9f7e9fda31078dfa27"
+      url "https://releases.agentcollision.com/v0.11.8/agentcollision_0.11.8_darwin_arm64.tar.gz"
+      sha256 "eb76d6926c34941628709e0c4314d7ae9e9c0b6d3e5622e3c4166acef12241b8"
 
       define_method(:install) do
         bin.install "agentcollision"
@@ -31,16 +31,16 @@ class Agentcollision < Formula
 
   on_linux do
     if Hardware::CPU.intel? && Hardware::CPU.is_64_bit?
-      url "https://releases.agentcollision.com/v0.11.7/agentcollision_0.11.7_linux_amd64.tar.gz"
-      sha256 "a49ca3d1bb0826d00a5b4f5d8a0d99d1e3649cefc015a918ba14f8b682ef543d"
+      url "https://releases.agentcollision.com/v0.11.8/agentcollision_0.11.8_linux_amd64.tar.gz"
+      sha256 "bffc268550fbfe864b5deb24ff949ba4158d9f8e4034e80b0d844d9dea3830e1"
       define_method(:install) do
         bin.install "agentcollision"
         bin.install_symlink "agentcollision" => "agc"
       end
     end
     if Hardware::CPU.arm? && Hardware::CPU.is_64_bit?
-      url "https://releases.agentcollision.com/v0.11.7/agentcollision_0.11.7_linux_arm64.tar.gz"
-      sha256 "aac7e58848c614bf607dadc1435b8f2ed5957996d455b19d67cfe624fa40e4d3"
+      url "https://releases.agentcollision.com/v0.11.8/agentcollision_0.11.8_linux_arm64.tar.gz"
+      sha256 "e5c90d5cec5b72ff5c8535b9f69533fc3a57835b923f29bb9d63701299786a83"
       define_method(:install) do
         bin.install "agentcollision"
         bin.install_symlink "agentcollision" => "agc"
@@ -87,7 +87,7 @@ class Agentcollision < Formula
       # Best-effort: if the user has never run agc init (no
       # ~/.claude/settings.json), the command no-ops.
       quiet_system "/bin/sh", "-c",
-        "#{bin}/agc rewrite-hooks 2>/dev/null || true"
+        "#{bin}/agc rewrite-hooks --quiet 2>/dev/null || true"
     end
   end
 
