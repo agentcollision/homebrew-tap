@@ -5,13 +5,13 @@
 class Agentcollision < Formula
   desc "Coordination daemon for parallel AI coding agents"
   homepage "https://github.com/agentcollision/agentcollision"
-  version "0.11.6"
+  version "0.11.7"
   license "Apache-2.0"
 
   on_macos do
     if Hardware::CPU.intel?
-      url "https://releases.agentcollision.com/v0.11.6/agentcollision_0.11.6_darwin_amd64.tar.gz"
-      sha256 "94f14725bc71f8b2909449ebf7d621da7a081cdf62f56ca3a2b3df198d6a674a"
+      url "https://releases.agentcollision.com/v0.11.7/agentcollision_0.11.7_darwin_amd64.tar.gz"
+      sha256 "60b07c679fef2ae09766727f630ac061d7831ce90cdf2c27c97aafa735f89eff"
 
       define_method(:install) do
         bin.install "agentcollision"
@@ -19,8 +19,8 @@ class Agentcollision < Formula
       end
     end
     if Hardware::CPU.arm?
-      url "https://releases.agentcollision.com/v0.11.6/agentcollision_0.11.6_darwin_arm64.tar.gz"
-      sha256 "bf667c6fc02151a7d1000ccc5b56dc77e0d5fa014737f8be60fabb78536cac17"
+      url "https://releases.agentcollision.com/v0.11.7/agentcollision_0.11.7_darwin_arm64.tar.gz"
+      sha256 "b27b759ca5c4b36620204e118a2d135eb40f9fb737addb9f7e9fda31078dfa27"
 
       define_method(:install) do
         bin.install "agentcollision"
@@ -31,16 +31,16 @@ class Agentcollision < Formula
 
   on_linux do
     if Hardware::CPU.intel? && Hardware::CPU.is_64_bit?
-      url "https://releases.agentcollision.com/v0.11.6/agentcollision_0.11.6_linux_amd64.tar.gz"
-      sha256 "2c23c659755dcc2360a49289b9929db689b935655da26efa1855e99e8fe3c479"
+      url "https://releases.agentcollision.com/v0.11.7/agentcollision_0.11.7_linux_amd64.tar.gz"
+      sha256 "a49ca3d1bb0826d00a5b4f5d8a0d99d1e3649cefc015a918ba14f8b682ef543d"
       define_method(:install) do
         bin.install "agentcollision"
         bin.install_symlink "agentcollision" => "agc"
       end
     end
     if Hardware::CPU.arm? && Hardware::CPU.is_64_bit?
-      url "https://releases.agentcollision.com/v0.11.6/agentcollision_0.11.6_linux_arm64.tar.gz"
-      sha256 "8e48eacaa8171dccff19358928cc86616333a03f25ef1ef29aedffa6912fde1b"
+      url "https://releases.agentcollision.com/v0.11.7/agentcollision_0.11.7_linux_arm64.tar.gz"
+      sha256 "aac7e58848c614bf607dadc1435b8f2ed5957996d455b19d67cfe624fa40e4d3"
       define_method(:install) do
         bin.install "agentcollision"
         bin.install_symlink "agentcollision" => "agc"
@@ -77,6 +77,17 @@ class Agentcollision < Formula
       # launchctl kickstart by hand.
       quiet_system "/bin/sh", "-c",
         "launchctl kickstart -k gui/$(id -u)/com.agentcollision.daemon 2>/dev/null || true"
+
+      # Rewrite Claude Code hook command paths to point at the new
+      # cellar version. Pre-2026-04-25 (v0.11.6 and earlier) baked the
+      # versioned cellar path into ~/.claude/settings.json on init —
+      # `brew upgrade` then deleted the old cellar path, breaking
+      # every hook silently. agc rewrite-hooks is idempotent and uses
+      # the version-stable symlink resolver so future upgrades survive.
+      # Best-effort: if the user has never run agc init (no
+      # ~/.claude/settings.json), the command no-ops.
+      quiet_system "/bin/sh", "-c",
+        "#{bin}/agc rewrite-hooks 2>/dev/null || true"
     end
   end
 
