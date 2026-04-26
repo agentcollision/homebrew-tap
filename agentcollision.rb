@@ -5,13 +5,13 @@
 class Agentcollision < Formula
   desc "Coordination daemon for parallel AI coding agents"
   homepage "https://github.com/agentcollision/agentcollision"
-  version "0.14.1"
+  version "0.14.3"
   license "Apache-2.0"
 
   on_macos do
     if Hardware::CPU.intel?
-      url "https://releases.agentcollision.com/v0.14.1/agentcollision_0.14.1_darwin_amd64.tar.gz"
-      sha256 "a11af8f8bc3625787a88d7ecc63b7ad522bf0aaa6697aa979f38a49d83c48acf"
+      url "https://releases.agentcollision.com/v0.14.3/agentcollision_0.14.3_darwin_amd64.tar.gz"
+      sha256 "fc4da6c30fee54af0fdfbe2b31331946d518d91086359ec7ecc21a6abdf1ed88"
 
       define_method(:install) do
         bin.install "agentcollision"
@@ -19,8 +19,8 @@ class Agentcollision < Formula
       end
     end
     if Hardware::CPU.arm?
-      url "https://releases.agentcollision.com/v0.14.1/agentcollision_0.14.1_darwin_arm64.tar.gz"
-      sha256 "75809c0bd40fbb459d7d5efa79b2cd5c92f0fe1cd4deaac5ed5fc77703eff171"
+      url "https://releases.agentcollision.com/v0.14.3/agentcollision_0.14.3_darwin_arm64.tar.gz"
+      sha256 "2723871993ea775931f38f4ef63e652760a5009599ae4f33530c25ed78ec468c"
 
       define_method(:install) do
         bin.install "agentcollision"
@@ -31,16 +31,16 @@ class Agentcollision < Formula
 
   on_linux do
     if Hardware::CPU.intel? && Hardware::CPU.is_64_bit?
-      url "https://releases.agentcollision.com/v0.14.1/agentcollision_0.14.1_linux_amd64.tar.gz"
-      sha256 "4adf23fa21cf96eb1b5da2b318bd43fd17d0598531e771e1ca3b311db4ae6eb6"
+      url "https://releases.agentcollision.com/v0.14.3/agentcollision_0.14.3_linux_amd64.tar.gz"
+      sha256 "20c50c32d072a76690cafc498e06af4c37208faf3665f4b5a6006744c5163b89"
       define_method(:install) do
         bin.install "agentcollision"
         bin.install_symlink "agentcollision" => "agc"
       end
     end
     if Hardware::CPU.arm? && Hardware::CPU.is_64_bit?
-      url "https://releases.agentcollision.com/v0.14.1/agentcollision_0.14.1_linux_arm64.tar.gz"
-      sha256 "677f8735af557589b4e717e3ff57261a2b251495f52a96b0ad43618df53f4008"
+      url "https://releases.agentcollision.com/v0.14.3/agentcollision_0.14.3_linux_arm64.tar.gz"
+      sha256 "c44c954c6fb2a6f1384731b61b7dc4cdd368accbc14534cc9c781848081f63f1"
       define_method(:install) do
         bin.install "agentcollision"
         bin.install_symlink "agentcollision" => "agc"
@@ -53,30 +53,25 @@ class Agentcollision < Formula
     # binary's in-memory state (matcher, sweeper, classifier) picks
     # up whatever fixes shipped in this release. Before alpha.11
     # users had to manually run `launchctl kickstart -k ...` after
-    # every `brew upgrade`, and the mismatch between the on-disk
-    # binary and the running daemon process caused hard-to-diagnose
-    # "why isn't my fix active" incidents. See bug #7 in
-    # docs/internals/v0.4/known-bugs-post-alpha.7.md.
+    # every `brew upgrade`; the mismatch between the on-disk binary
+    # and the running daemon process caused hard-to-diagnose "why
+    # isn't my fix active" incidents.
     #
-    # Only does anything if the launchd service is already loaded
-    # (i.e. the user previously ran `ab init` and opted into
-    # autostart). On a fresh install, the service isn't registered
-    # and the kickstart silently no-ops — `ab init` will wire up
-    # autostart when the user runs it.
+    # v0.14.2: replaced the inline `launchctl kickstart -k` with
+    # `agc heal`. kickstart silently failed in several launchd
+    # domain edge cases (de-registered service, stale socket, zombie
+    # PID holding the unix socket) which we hit in production.
+    # `agc heal` does the full diagnose-and-fix flow: probe state,
+    # SIGTERM/SIGKILL the running process if any, remove stale
+    # socket, `launchctl bootout` + `bootstrap` the plist, wait for
+    # /v1/info to confirm the new version is up. Idempotent.
     #
-    # alpha.14 fix: alpha.11–alpha.13 used Ruby's `system` with the
-    # `err: File::NULL` keyword, which makes Homebrew echo the
-    # entire call (including the Ruby keyword args) to the user as
-    # `==> launchctl kickstart -k ... {err: "/dev/null"}`. Ugly.
-    # `quiet_system` suppresses the echo, and we route stderr
-    # through a shell redirect inside a single argv string so no
-    # Ruby keywords leak into Homebrew's output.
+    # --quiet suppresses success chatter so brew output stays clean;
+    # diagnostic + error output still surfaces on failure so a broken
+    # upgrade is visible.
     if OS.mac?
-      # Restart the service if registered so the new binary takes effect
-      # immediately after `brew upgrade` without the user having to
-      # launchctl kickstart by hand.
       quiet_system "/bin/sh", "-c",
-        "launchctl kickstart -k gui/$(id -u)/com.agentcollision.daemon 2>/dev/null || true"
+        "#{bin}/agc heal --quiet 2>/dev/null || true"
 
       # Rewrite Claude Code hook command paths to point at the new
       # cellar version. Pre-2026-04-25 (v0.11.6 and earlier) baked the
