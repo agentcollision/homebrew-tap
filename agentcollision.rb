@@ -5,13 +5,13 @@
 class Agentcollision < Formula
   desc "Coordination daemon for parallel AI coding agents"
   homepage "https://github.com/agentcollision/agentcollision"
-  version "0.17.33"
+  version "0.17.34"
   license "Apache-2.0"
 
   on_macos do
     if Hardware::CPU.intel?
-      url "https://releases.agentcollision.com/v0.17.33/agentcollision_0.17.33_darwin_amd64.tar.gz"
-      sha256 "7a755f0782222220469ab86a9ed4b96f39726cfd23efb76137cddc5521085731"
+      url "https://releases.agentcollision.com/v0.17.34/agentcollision_0.17.34_darwin_amd64.tar.gz"
+      sha256 "3118388980639da733fae2f7973f1850c995e24ec0c88f8d1a07ba79d508c70a"
 
       define_method(:install) do
         bin.install "agentcollision"
@@ -19,8 +19,8 @@ class Agentcollision < Formula
       end
     end
     if Hardware::CPU.arm?
-      url "https://releases.agentcollision.com/v0.17.33/agentcollision_0.17.33_darwin_arm64.tar.gz"
-      sha256 "7963c895dfd2418ab6798fad19dbd8841415d13ab5e658f4137e07811d424a60"
+      url "https://releases.agentcollision.com/v0.17.34/agentcollision_0.17.34_darwin_arm64.tar.gz"
+      sha256 "da27d5e2431b0fe2ac55621be2f04c07a17c4be4720f9af1fa8b198cf8fb34e3"
 
       define_method(:install) do
         bin.install "agentcollision"
@@ -31,16 +31,16 @@ class Agentcollision < Formula
 
   on_linux do
     if Hardware::CPU.intel? && Hardware::CPU.is_64_bit?
-      url "https://releases.agentcollision.com/v0.17.33/agentcollision_0.17.33_linux_amd64.tar.gz"
-      sha256 "93fc16216d9dbeb8120f6a41dbb12d268ff4ee798c80206874c0011f746b4132"
+      url "https://releases.agentcollision.com/v0.17.34/agentcollision_0.17.34_linux_amd64.tar.gz"
+      sha256 "5d8c172d035347855fe59de6819c2a640ed29c81da428328630bf44dc26d5934"
       define_method(:install) do
         bin.install "agentcollision"
         bin.install_symlink "agentcollision" => "agc"
       end
     end
     if Hardware::CPU.arm? && Hardware::CPU.is_64_bit?
-      url "https://releases.agentcollision.com/v0.17.33/agentcollision_0.17.33_linux_arm64.tar.gz"
-      sha256 "251564afdff12fc263ba10c5d4c960658f6acbcba066ff2cc32c4fdc2eeb69c6"
+      url "https://releases.agentcollision.com/v0.17.34/agentcollision_0.17.34_linux_arm64.tar.gz"
+      sha256 "3ab2e03accee8b4e4daed8cb19de93f23ed68b001d8b2586026f2ff4f193af51"
       define_method(:install) do
         bin.install "agentcollision"
         bin.install_symlink "agentcollision" => "agc"
@@ -70,8 +70,32 @@ class Agentcollision < Formula
     # diagnostic + error output still surfaces on failure so a broken
     # upgrade is visible.
     if OS.mac?
-      quiet_system "/bin/sh", "-c",
-        "#{bin}/agc heal --quiet 2>/dev/null || true"
+      # Heal can fail on the first attempt during brew upgrade due
+      # to launchd KeepAlive races (the old daemon respawns
+      # between SIGTERM and bootstrap, conflicting with the new
+      # one). Retry up to 3 times with backoff before giving up.
+      # If all attempts fail, surface the error to brew's output —
+      # silently swallowing it produced the post-upgrade
+      # "daemon not running" condition users had to fix manually.
+      #
+      # We use `system` (not `quiet_system`) so brew shows our
+      # diagnostic output. heal's --quiet flag suppresses success
+      # chatter; failures still print to stderr.
+      healed = false
+      3.times do |attempt|
+        if system("#{bin}/agc", "heal", "--quiet")
+          healed = true
+          break
+        end
+        sleep(attempt + 1) # 1s, 2s, 3s
+      end
+      unless healed
+        # Heal printed its own diagnostic to stderr (recovery
+        # advice for launchd-stuck cases, etc.); we don't try
+        # to duplicate or summarize it here. Just point the
+        # user at status so they know how to verify.
+        opoo "agc heal failed after 3 attempts. Check `agc status` to confirm daemon state."
+      end
 
       # Rewrite Claude Code hook command paths to point at the new
       # cellar version. Pre-2026-04-25 (v0.11.6 and earlier) baked the
@@ -81,8 +105,7 @@ class Agentcollision < Formula
       # the version-stable symlink resolver so future upgrades survive.
       # Best-effort: if the user has never run agc init (no
       # ~/.claude/settings.json), the command no-ops.
-      quiet_system "/bin/sh", "-c",
-        "#{bin}/agc rewrite-hooks --quiet 2>/dev/null || true"
+      system("#{bin}/agc", "rewrite-hooks", "--quiet") || nil
     end
   end
 
