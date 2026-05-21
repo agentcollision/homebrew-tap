@@ -5,13 +5,13 @@
 class Agentcollision < Formula
   desc "Coordination daemon for parallel AI coding agents"
   homepage "https://github.com/agentcollision/agentcollision"
-  version "0.33.3"
+  version "0.33.4"
   license "Apache-2.0"
 
   on_macos do
     if Hardware::CPU.intel?
-      url "https://releases.agentcollision.com/v0.33.3/agentcollision_0.33.3_darwin_amd64.tar.gz"
-      sha256 "e47a412d8d3e253339b00d3be36950f9268f8085338e756ac10a4b3a26657005"
+      url "https://releases.agentcollision.com/v0.33.4/agentcollision_0.33.4_darwin_amd64.tar.gz"
+      sha256 "e8dd9173c3afb9f84c22f1191c691a1fd16fd08c044b9ba41a27ea80f5479f69"
 
       define_method(:install) do
         bin.install "agentcollision"
@@ -19,8 +19,8 @@ class Agentcollision < Formula
       end
     end
     if Hardware::CPU.arm?
-      url "https://releases.agentcollision.com/v0.33.3/agentcollision_0.33.3_darwin_arm64.tar.gz"
-      sha256 "52d6fc9c2850c717f557cabf3c993548500266efb6152ec5af691df5f64692b8"
+      url "https://releases.agentcollision.com/v0.33.4/agentcollision_0.33.4_darwin_arm64.tar.gz"
+      sha256 "75e1414cbd1f2da339aff136253a667e2d75b38c11f4752a5ec522b836419a6f"
 
       define_method(:install) do
         bin.install "agentcollision"
@@ -31,16 +31,16 @@ class Agentcollision < Formula
 
   on_linux do
     if Hardware::CPU.intel? && Hardware::CPU.is_64_bit?
-      url "https://releases.agentcollision.com/v0.33.3/agentcollision_0.33.3_linux_amd64.tar.gz"
-      sha256 "6190faabb1ce72865921927f985fd55952812ba05af91dd79cf553e478a2957c"
+      url "https://releases.agentcollision.com/v0.33.4/agentcollision_0.33.4_linux_amd64.tar.gz"
+      sha256 "7004d381d4511f0a16c1ae2facc14a2b43832fb76160fe4f7c34672c8510346f"
       define_method(:install) do
         bin.install "agentcollision"
         bin.install_symlink "agentcollision" => "agc"
       end
     end
     if Hardware::CPU.arm? && Hardware::CPU.is_64_bit?
-      url "https://releases.agentcollision.com/v0.33.3/agentcollision_0.33.3_linux_arm64.tar.gz"
-      sha256 "153bb4856c0ef5b48f7e6bf71784d7bc7785fc2b73d5ec4e6f47eb3dbcc73260"
+      url "https://releases.agentcollision.com/v0.33.4/agentcollision_0.33.4_linux_arm64.tar.gz"
+      sha256 "7f1b2e5a47ef368281d70cb391879a092c5e9466da318888e059826646346c2c"
       define_method(:install) do
         bin.install "agentcollision"
         bin.install_symlink "agentcollision" => "agc"
