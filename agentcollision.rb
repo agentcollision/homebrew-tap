@@ -5,13 +5,13 @@
 class Agentcollision < Formula
   desc "Coordination daemon for parallel AI coding agents"
   homepage "https://github.com/agentcollision/agentcollision"
-  version "0.71.0"
+  version "0.72.0"
   license "Apache-2.0"
 
   on_macos do
     if Hardware::CPU.intel?
-      url "https://releases.agentcollision.com/v0.71.0/agentcollision_0.71.0_darwin_amd64.tar.gz"
-      sha256 "82b13f6353e334ac0fa18b1b9e6d744eeb7b1ec30b7cbbf095ebf57d8bf8362b"
+      url "https://releases.agentcollision.com/v0.72.0/agentcollision_0.72.0_darwin_amd64.tar.gz"
+      sha256 "ee85413fef053ea865131ce3a54c25fd84aafba53431c4cbb547e2512ef3c5d6"
 
       define_method(:install) do
         bin.install "agentcollision"
@@ -19,8 +19,8 @@ class Agentcollision < Formula
       end
     end
     if Hardware::CPU.arm?
-      url "https://releases.agentcollision.com/v0.71.0/agentcollision_0.71.0_darwin_arm64.tar.gz"
-      sha256 "021be49bac6a8af401a9384931aa46cd3c018d5a07e4144ee9eeb71dc135e400"
+      url "https://releases.agentcollision.com/v0.72.0/agentcollision_0.72.0_darwin_arm64.tar.gz"
+      sha256 "b7c2f1ab5a5d2b81cbdc3a6da6a9d4fdad35d0cd4b89bfa060d305d261483b3b"
 
       define_method(:install) do
         bin.install "agentcollision"
@@ -31,16 +31,16 @@ class Agentcollision < Formula
 
   on_linux do
     if Hardware::CPU.intel? && Hardware::CPU.is_64_bit?
-      url "https://releases.agentcollision.com/v0.71.0/agentcollision_0.71.0_linux_amd64.tar.gz"
-      sha256 "4c16355f6deb13caa5213455c205fb75f9de605b36f509e4277e963bc3760170"
+      url "https://releases.agentcollision.com/v0.72.0/agentcollision_0.72.0_linux_amd64.tar.gz"
+      sha256 "908465c3ec311cd36f2aaf14add03594ebf179cce0484374daf837670a3634fe"
       define_method(:install) do
         bin.install "agentcollision"
         bin.install_symlink "agentcollision" => "agc"
       end
     end
     if Hardware::CPU.arm? && Hardware::CPU.is_64_bit?
-      url "https://releases.agentcollision.com/v0.71.0/agentcollision_0.71.0_linux_arm64.tar.gz"
-      sha256 "f1befcc4946220932f8f8e0df65760010ff4256c2c36b78aba44a7031a37c4bc"
+      url "https://releases.agentcollision.com/v0.72.0/agentcollision_0.72.0_linux_arm64.tar.gz"
+      sha256 "ea4fce2f24ac3c1519d82df75145c3f074cd9eec037f8f8a2cda4fdbb4c97584"
       define_method(:install) do
         bin.install "agentcollision"
         bin.install_symlink "agentcollision" => "agc"
@@ -113,14 +113,13 @@ class Agentcollision < Formula
     <<~EOS
       AgentCollision #{version} installed.
 
-      First-time setup:
-        agc init        # detect AI tools, install hooks, optional autostart
-        agc login       # connect this machine to your account (opens browser)
+      First-time setup (opens a guided page in your browser):
+        agc setup
 
       What's new in this version:
         https://github.com/agentcollision/agentcollision/blob/main/CHANGELOG.md
 
-      Dashboard (after `agc init`):
+      Dashboard (after `agc setup`):
         http://localhost:7777/ui/
 
       Quick start:
