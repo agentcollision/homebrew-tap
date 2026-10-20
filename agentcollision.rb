@@ -11,7 +11,7 @@ class Agentcollision < Formula
   on_macos do
     if Hardware::CPU.intel?
       url "https://releases.agentcollision.com/v0.77.0/agentcollision_0.77.0_darwin_amd64.tar.gz"
-      sha256 "6cc7451e5c909b44d5b829f036b5ad2f0b33451cdeaa1c720c16a0708605a1a3"
+      sha256 "327e5b2c58aba0c3dd72c0e18e9c127faf4a676b0d9761b33f3fa38408914cd9"
 
       define_method(:install) do
         bin.install "agentcollision"
@@ -20,7 +20,7 @@ class Agentcollision < Formula
     end
     if Hardware::CPU.arm?
       url "https://releases.agentcollision.com/v0.77.0/agentcollision_0.77.0_darwin_arm64.tar.gz"
-      sha256 "caf1fe9128484e0ad4b130518f3f4eb16acd6fa636f1586028f34551f03d4b6d"
+      sha256 "04299ce2cb71b46f2c7ff74e25ae95160c95d21a65c2915672ec58812affc53d"
 
       define_method(:install) do
         bin.install "agentcollision"
@@ -32,7 +32,7 @@ class Agentcollision < Formula
   on_linux do
     if Hardware::CPU.intel? && Hardware::CPU.is_64_bit?
       url "https://releases.agentcollision.com/v0.77.0/agentcollision_0.77.0_linux_amd64.tar.gz"
-      sha256 "2f2a06eb5b1ba7dd0fb2ceb2fcd18550c02f55721d6d85fdebcdc950b1e1c833"
+      sha256 "4adcbe213c90e6e89c0179b5d9bf5bf7ae81908d78ba49be2c92017025dbefd2"
       define_method(:install) do
         bin.install "agentcollision"
         bin.install_symlink "agentcollision" => "agc"
@@ -40,7 +40,7 @@ class Agentcollision < Formula
     end
     if Hardware::CPU.arm? && Hardware::CPU.is_64_bit?
       url "https://releases.agentcollision.com/v0.77.0/agentcollision_0.77.0_linux_arm64.tar.gz"
-      sha256 "13d0a492157fe91e1d7221620f491733c097f8d15108527563f9cea1bdd4597d"
+      sha256 "d2d17696ac23e887604f49023f8806b688b60d4843809e851436186a6bdd06d6"
       define_method(:install) do
         bin.install "agentcollision"
         bin.install_symlink "agentcollision" => "agc"
