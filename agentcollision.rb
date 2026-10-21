@@ -5,13 +5,13 @@
 class Agentcollision < Formula
   desc "Coordination daemon for parallel AI coding agents"
   homepage "https://github.com/agentcollision/agentcollision"
-  version "0.78.2"
+  version "0.78.3"
   license "Apache-2.0"
 
   on_macos do
     if Hardware::CPU.intel?
-      url "https://releases.agentcollision.com/v0.78.2/agentcollision_0.78.2_darwin_amd64.tar.gz"
-      sha256 "1ee363fe538702d105624ad7a4578ffa7df2c8bd9cc8d4cfb11630450bf2a9a2"
+      url "https://releases.agentcollision.com/v0.78.3/agentcollision_0.78.3_darwin_amd64.tar.gz"
+      sha256 "a22a646379233f227b317e65da61f9921122b7a1ffc311dfd61891f826020978"
 
       define_method(:install) do
         bin.install "agentcollision"
@@ -19,8 +19,8 @@ class Agentcollision < Formula
       end
     end
     if Hardware::CPU.arm?
-      url "https://releases.agentcollision.com/v0.78.2/agentcollision_0.78.2_darwin_arm64.tar.gz"
-      sha256 "aa775062066fd09329dc5134003a374fb28f4f0adac5839c6565b5bdbfe777f7"
+      url "https://releases.agentcollision.com/v0.78.3/agentcollision_0.78.3_darwin_arm64.tar.gz"
+      sha256 "90b231519348ae7b3ffe44fc32466835c025d07592cedc829e5cde6ea33ad667"
 
       define_method(:install) do
         bin.install "agentcollision"
@@ -31,16 +31,16 @@ class Agentcollision < Formula
 
   on_linux do
     if Hardware::CPU.intel? && Hardware::CPU.is_64_bit?
-      url "https://releases.agentcollision.com/v0.78.2/agentcollision_0.78.2_linux_amd64.tar.gz"
-      sha256 "30baf476ee91558d94bfa153c7a4fe432943855a596dd84a6c3973aa9351612c"
+      url "https://releases.agentcollision.com/v0.78.3/agentcollision_0.78.3_linux_amd64.tar.gz"
+      sha256 "c00658c80261492aebd92809c3a6dcbf268961881d3d564bd927411c5727694b"
       define_method(:install) do
         bin.install "agentcollision"
         bin.install_symlink "agentcollision" => "agc"
       end
     end
     if Hardware::CPU.arm? && Hardware::CPU.is_64_bit?
-      url "https://releases.agentcollision.com/v0.78.2/agentcollision_0.78.2_linux_arm64.tar.gz"
-      sha256 "7aa28bb14a67025871e0e6de10616ec53e15c141ddc7b697fc0c4bf9bb4cd3c6"
+      url "https://releases.agentcollision.com/v0.78.3/agentcollision_0.78.3_linux_arm64.tar.gz"
+      sha256 "2feb6858a8f78f42a4635e32b44e85237e4cf2ccf1bce3e7e4f41377dda8d98a"
       define_method(:install) do
         bin.install "agentcollision"
         bin.install_symlink "agentcollision" => "agc"
@@ -49,63 +49,24 @@ class Agentcollision < Formula
   end
 
   def post_install
-    # Auto-restart the AgentCollision daemon after upgrade so the new
-    # binary's in-memory state (matcher, sweeper, classifier) picks
-    # up whatever fixes shipped in this release. Before alpha.11
-    # users had to manually run `launchctl kickstart -k ...` after
-    # every `brew upgrade`; the mismatch between the on-disk binary
-    # and the running daemon process caused hard-to-diagnose "why
-    # isn't my fix active" incidents.
+    # Restart the daemon on the new binary by asking launchd to restart its
+    # job; the plist runs the version-stable /opt/homebrew/bin/agc.
     #
-    # v0.14.2: replaced the inline `launchctl kickstart -k` with
-    # `agc heal`. kickstart silently failed in several launchd
-    # domain edge cases (de-registered service, stale socket, zombie
-    # PID holding the unix socket) which we hit in production.
-    # `agc heal` does the full diagnose-and-fix flow: probe state,
-    # SIGTERM/SIGKILL the running process if any, remove stale
-    # socket, `launchctl bootout` + `bootstrap` the plist, wait for
-    # /v1/info to confirm the new version is up. Idempotent.
-    #
-    # --quiet suppresses success chatter so brew output stays clean;
-    # diagnostic + error output still surfaces on failure so a broken
-    # upgrade is visible.
+    # WHY (2026-10-21, v0.78.2): this used to run `agc heal` and
+    # `agc rewrite-hooks`. Homebrew runs post_install sandboxed with a
+    # temporary HOME, so neither could read ~/.agentcollision or
+    # ~/.claude: heal couldn't see the daemon, booted the launchd job out
+    # and either failed to load it again (daemon down ~2 minutes, or a
+    # hook started an unsupervised copy) or couldn't confirm it came back
+    # (brew retried, restarting the daemon each time, then warned "the
+    # post-install step did not complete successfully"). rewrite-hooks
+    # always failed ("settings.json not found"); hooks already use the
+    # stable path, so it had nothing to do. A launchd kickstart needs no
+    # file access: one restart, ~6s, no warning. When the job isn't
+    # loaded (fresh install, autostart off) it is a no-op; `agc setup`
+    # installs the job.
     if OS.mac?
-      # Heal can fail on the first attempt during brew upgrade due
-      # to launchd KeepAlive races (the old daemon respawns
-      # between SIGTERM and bootstrap, conflicting with the new
-      # one). Retry up to 3 times with backoff before giving up.
-      # If all attempts fail, surface the error to brew's output —
-      # silently swallowing it produced the post-upgrade
-      # "daemon not running" condition users had to fix manually.
-      #
-      # We use `system` (not `quiet_system`) so brew shows our
-      # diagnostic output. heal's --quiet flag suppresses success
-      # chatter; failures still print to stderr.
-      healed = false
-      3.times do |attempt|
-        if system("#{bin}/agc", "heal", "--quiet")
-          healed = true
-          break
-        end
-        sleep(attempt + 1) # 1s, 2s, 3s
-      end
-      unless healed
-        # Heal printed its own diagnostic to stderr (recovery
-        # advice for launchd-stuck cases, etc.); we don't try
-        # to duplicate or summarize it here. Just point the
-        # user at status so they know how to verify.
-        opoo "agc heal failed after 3 attempts. Check `agc status` to confirm daemon state."
-      end
-
-      # Rewrite Claude Code hook command paths to point at the new
-      # cellar version. Pre-2026-04-25 (v0.11.6 and earlier) baked the
-      # versioned cellar path into ~/.claude/settings.json on init —
-      # `brew upgrade` then deleted the old cellar path, breaking
-      # every hook silently. agc rewrite-hooks is idempotent and uses
-      # the version-stable symlink resolver so future upgrades survive.
-      # Best-effort: if the user has never run agc init (no
-      # ~/.claude/settings.json), the command no-ops.
-      system("#{bin}/agc", "rewrite-hooks", "--quiet") || nil
+      quiet_system "launchctl", "kickstart", "-k", "gui/#{Process.uid}/com.agentcollision.daemon"
     end
   end
 
